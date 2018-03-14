@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LAB1</title>
+	<script src="../build/three.js"></script>
+	<script src='js/libs/dat.gui.min.js'></script>
+	<script src="../src/materials/MeshBasicMaterial.js"></script>
+	<style>
+		body {margin:0;}
+		canvas {width:100%;height: 100%; }
+	</style>
+</head>
+<body>
+	<script>
+		var camera, scene, renderer;
+		var geometry, material, mesh;
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+			camera.position.z = 1;
+
+			scene = new THREE.Scene();
+
+			geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+			material = new THREE.MeshNormalMaterial();
+
+			mesh = new THREE.Mesh( geometry, material );
+			scene.add( mesh );
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			displayGUI();
+
+		}
+
+		function displayGUI(){
+			var gui = new dat.GUI();
+			var aux;
+			parameters = {
+				x1:1,y1:1,z1:1,
+				x2:1,y2:1,z2:1,
+				x3:1,y3:1,z3:1
+			}
+			var size = gui.addFolder('Size');
+			size.open();
+
+			var xsize = size.add(parameters,'x1').min(0.1).max(10).step(0.01).name('X-Axis');
+			var ysize = size.add(parameters,'y1').min(0.1).max(10).step(0.01).name('Y-Axis');
+			var zsize = size.add(parameters,'z1').min(0.1).max(10).step(0.01).name('Z-Axis');
+			xsize.onChange(function(aux){mesh.scale.x=aux;});
+			ysize.onChange(function(aux){mesh.scale.y=aux;});	
+			zsize.onChange(function(aux){mesh.scale.z=aux;});
+
+			var rot = gui.addFolder('Rotation');
+			rot.open();
+			var xrot = rot.add(parameters,'x2').min(0.1).max(10).step(0.01).name('X-Axis');
+			var yrot = rot.add(parameters,'y2').min(0.1).max(10).step(0.01).name('Y-Axis');
+			var zrot = rot.add(parameters,'z2').min(0.1).max(10).step(0.01).name('Z-Axis');
+
+			xrot.onChange(function(aux){mesh.rotation.x=aux;});
+			yrot.onChange(function(aux){mesh.rotation.y=aux;});	
+			zrot.onChange(function(aux){mesh.rotation.z=aux;});
+
+			var trans = gui.addFolder('Translate');
+			trans.open();
+			var xtrans = trans.add(parameters,'x3').min(-5).max(5).step(0.0001).name('X-Axis');
+			var ytrans = trans.add(parameters,'y3').min(-5).max(5).step(0.0001).name('Y-Axis');
+			var ztrans = trans.add(parameters,'z3').min(-5).max(5).step(0.0001).name('Z-Axis');
+
+			xtrans.onChange(function(aux){mesh.position.x=aux;});
+			ytrans.onChange(function(aux){mesh.position.y=aux;});	
+			ztrans.onChange(function(aux){mesh.position.z=aux;});
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			//mesh.rotation.x += 0.01;
+			//mesh.rotation.y += 0.02;
+
+			renderer.render( scene, camera );
+
+		}
+	</script>
+</body>
+</html>

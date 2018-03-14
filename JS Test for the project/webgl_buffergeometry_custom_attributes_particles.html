@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>TEST</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
+			}
+			a {
+				color: #fff;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener"><h1>TEST</h1></div>
+
+		<script src="../three.js-master/build/three.js"></script>
+
+		<script src="../three.js-master/examples/js/Detector.js"></script>
+		<script src="../three.js-master/examples/js/libs/stats.min.js"></script>
+		
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			attribute float size;
+
+			varying vec3 vColor;
+
+			void main() {
+
+				vColor = color;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_PointSize = size * ( 300.0 / -mvPosition.z );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform sampler2D texture;
+
+			varying vec3 vColor;
+
+			void main() {
+
+				gl_FragColor = vec4( vColor, 1.0 );
+
+				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+
+			}
+
+		</script>
+
+
+		<script>
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var renderer, scene, camera
+
+		var particleSystem, uniforms, geometry;
+
+		var particles = 1000;
+
+
+		var meshFloor;
+
+		var keyboard = {};
+		var player = { height:1.8, speed:0.2, turnSpeed:Math.PI*0.02 };
+
+
+		init();
+		animate();
+
+		function init() {
+			//camera = new THREE.PerspectiveCamera(40,width/height,1,10000);
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+			//camera.position.z = 300;
+
+			camera.position.set(0, player.height, -5);
+			camera.lookAt(new THREE.Vector3(0,player.height,0));
+
+			scene = new THREE.Scene();
+
+			uniforms = {
+
+				texture:   { value: new THREE.TextureLoader().load( "../three.js-master/examples/textures/sprites/spark1.png" ) }
+
+			};
+
+			var shaderMaterial = new THREE.ShaderMaterial( {
+
+				uniforms:       uniforms,
+				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
+				transparent:    true,
+				vertexColors:   true
+
+			});
+
+
+			var radius = 200;
+
+			geometry = new THREE.BufferGeometry();
+
+			var positions = [];
+			var colors = [];
+			var sizes = [];
+
+			var color = new THREE.Color("rgb(193, 196, 188)");
+
+			for ( var i = 0; i < particles; i ++ ) {
+
+				positions.push( ( Math.random() * 2 - 1 ) * radius );
+				positions.push( ( Math.random() * 2 - 1 ) * radius );
+				positions.push( ( Math.random() * 2 - 1 ) * radius );
+
+				//color.setHSL( i / particles, 1.0, 0.5 );
+
+				colors.push( color.r, color.g, color.b );
+
+				sizes.push( 20 );;
+
+			}
+
+			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
+
+			particleSystem = new THREE.Points( geometry, shaderMaterial );
+
+
+			meshFloor = new THREE.Mesh(
+				new THREE.PlaneGeometry(10,10,10,10),
+				new THREE.MeshBasicMaterial({color:0xffffff, wireframe: false})
+			);
+			meshFloor.rotation.x -= Math.PI / 2;
+			//scene.add(meshFloor,particleSystem);
+			//scene.add( particleSystem, meshFloor );
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
+			scene.add(meshFloor);
+			scene.add(particleSystem);
+			//renderer.setSize(900, 1000);
+			renderer.setSize( window.innerWidth/2, window.innerHeight, false );
+
+			var container = document.getElementById( 'container' );
+			container.appendChild( renderer.domElement );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+			meshFloor.scale.y+=0.05;
+			requestAnimationFrame( animate );
+			if(keyboard[87]){ // W key
+				camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
+				camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
+			}
+			if(keyboard[83]){ // S key
+				camera.position.x += Math.sin(camera.rotation.y) * player.speed;
+				camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
+			}
+			if(keyboard[65]){ // A key
+				// Redirect motion by 90 degrees
+				camera.position.x += Math.sin(camera.rotation.y + Math.PI/2) * player.speed;
+				camera.position.z += -Math.cos(camera.rotation.y + Math.PI/2) * player.speed;
+			}
+			if(keyboard[68]){ // D key
+				camera.position.x += Math.sin(camera.rotation.y - Math.PI/2) * player.speed;
+				camera.position.z += -Math.cos(camera.rotation.y - Math.PI/2) * player.speed;
+			}
+			
+			// Keyboard turn inputs
+			if(keyboard[37]){ // left arrow key
+				camera.rotation.y -= player.turnSpeed;
+			}
+			if(keyboard[39]){ // right arrow key
+				camera.rotation.y += player.turnSpeed;
+			}
+
+			render();
+		}
+
+		function render() {
+
+			var time = Date.now() * 0.005;
+
+			particleSystem.rotation.z = 0.01 * time;
+
+			var sizes = geometry.attributes.size.array;
+
+			for ( var i = 0; i < particles; i++ ) {
+
+				sizes[ i ] = 10 * ( 1 + Math.sin( 0.1 * i + time ) );
+
+			}
+
+			geometry.attributes.size.needsUpdate = true;
+
+			renderer.render( scene, camera );
+
+		}
+		function keyDown(event){
+			keyboard[event.keyCode] = true;	
+		}
+
+		function keyUp(event){
+			keyboard[event.keyCode] = false;		
+		}
+
+		window.addEventListener('keydown', keyDown);
+		window.addEventListener('keyup', keyUp);
+
+
+		window.onload = init;
+
+	</script>
+	
+
+</body>
+</html>
