@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>TEST</title>
+		<title>pathTest.html</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -29,7 +29,7 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry custom attributes - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">Path Test</a></div>
 
 		<script src="../three.js-master/build/three.js"></script>
 
@@ -63,7 +63,8 @@
 		var particleSystem, uniforms, geometry;
 		var particles = 1000;
 
-		var meshFloor;
+		//var meshFloor;
+		var meshFloors = [];
 
 		init();
 		animate();
@@ -103,13 +104,57 @@
 			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
 			particleSystem = new THREE.Points( geometry, shaderMaterial );
 
-			meshFloor = new THREE.Mesh(
-				new THREE.PlaneGeometry(10,10,10,10),
-				new THREE.MeshBasicMaterial({color:0xffffff, wireframe: false})
+			//FLOORS
+			//GREEN
+			meshFloors[0]= new THREE.Mesh(
+				new THREE.PlaneGeometry(2,2,10,10),
+				new THREE.MeshBasicMaterial({color:0x2fa51d, wireframe: false})
+			);
+			//CIAN
+			meshFloors[1]= new THREE.Mesh(
+				new THREE.PlaneGeometry(2,2,10,10),
+				new THREE.MeshBasicMaterial({color:0x1d9ca5, wireframe: false})
+			);
+			//MAGENTA
+			meshFloors[2]= new THREE.Mesh(
+				new THREE.PlaneGeometry(2,2,10,10),
+				new THREE.MeshBasicMaterial({color:0x881da5, wireframe: false})
+			);
+			//RED
+			meshFloors[3]=new THREE.Mesh(
+				new THREE.PlaneGeometry(2,2,10,10),
+				new THREE.MeshBasicMaterial({color:0xd31b1b, wireframe: false})
+			);
+			//YELLOW
+			meshFloors[4]=new THREE.Mesh(
+				new THREE.PlaneGeometry(2,2,10,10),
+				new THREE.MeshBasicMaterial({color:0xd2c01a, wireframe: false})
 			);
 
-			meshFloor.rotation.x -= Math.PI / 2;
-			scene.add(meshFloor);
+			
+			meshFloors[1].position.x=meshFloors[4].position.x-2;
+			meshFloors[0].position.x=meshFloors[4].position.x-4;
+			meshFloors[3].position.x=meshFloors[4].position.x+2;
+			meshFloors[2].position.x=meshFloors[4].position.x+4;
+
+			for (var i = 0; i < meshFloors.length; i++) {
+				meshFloors[i].rotation.x -=Math.PI / 2;
+			}
+			//
+
+			/*meshFloor = new THREE.Mesh(
+				new THREE.PlaneGeometry(10,10,10,10),
+				new THREE.MeshBasicMaterial({color:0xffffff, wireframe: false})
+			);*/
+
+			
+			//meshFloor.rotation.x -= Math.PI / 2;
+			//scene.add(meshFloor);
+			scene.add(meshFloors[0]);
+			scene.add(meshFloors[1]);
+			scene.add(meshFloors[2]);
+			scene.add(meshFloors[3]);
+			scene.add(meshFloors[4]);
 			scene.add( particleSystem );
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
@@ -124,7 +169,18 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 		}
 		function animate() {
-			meshFloor.scale.y+=0.05;
+			meshFloors[0].scale.y=100000;
+			meshFloors[1].scale.y=100000;
+			meshFloors[2].scale.y=100000;
+			meshFloors[3].scale.y=100000;
+			meshFloors[4].scale.y=100000;
+			console.log(meshFloors[0].scale.y);
+			/*for (var i = 0; i < meshFloors.length; i++) {
+				if(meshFloors[i].scale.y>1000000){
+					meshFloors[i].scale.y=100000;
+				}
+			}*/
+			//meshFloor.scale.y+=0.05;
 			requestAnimationFrame( animate );
 			render();
 		}
