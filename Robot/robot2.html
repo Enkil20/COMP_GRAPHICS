@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Robot Activity</title>
+	<meta charset="utf-8">
+	<script src="src/three.js"></script>
+	<script src="src/stats.min.js"></script>
+	<script src="src/MeshBasicMaterial.js"></script>
+	<script src="src/OrbitControls.js"></script>
+</head>
+<body>
+	<script>
+		var camera, material, scene, renderer, controls;
+		var robot, primitive, head, topp, neck, lArm, rArm, lLeg1, rLeg1, lLeg2,rLeg2, lShld, rShld, chest, lFoot, rFoot, boxPrimitive, spherePrimitive, legBox, footBox,footBall, lHand, rHand, handBall, handBox;
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+			controls = new THREE.OrbitControls( camera );
+			camera.position.set( 0, 0, 30 );
+			camera.lookAt(0,0,0);
+			controls.update();
+
+			scene = new THREE.Scene();
+			material = new THREE.MeshNormalMaterial();
+			spherePrimitive = new THREE.Mesh( new THREE.SphereBufferGeometry(1,32,32), material);
+			boxPrimitive = new THREE.Mesh( new THREE.BoxGeometry(1,4,1), material);
+			boxPrimitive.position.y = spherePrimitive.position.y+2;
+			primitive = new THREE.Mesh();
+			primitive.add(boxPrimitive,spherePrimitive);
+
+			chest = new THREE.Mesh( new THREE.BoxGeometry(5,8,2),material);
+			
+			neck = new THREE.Mesh( new THREE.BoxGeometry(1,2,1),material);
+			neck.position.y = chest.position.y+4;
+			head = new THREE.Mesh( new THREE.SphereBufferGeometry(2,32,32),material)
+			head.position.y = neck.position.y + 2.8;
+			topp = new THREE.Mesh();
+			topp.add(neck,head);
+
+			lShld = primitive.clone();
+			lShld.position.set(-3,4,0);
+			lShld.rotation.z = 9;
+			rShld = lShld.clone();
+			rShld.position.x +=6;
+			rShld.rotation.y = Math.PI;
+
+			lLeg1 = primitive.clone();
+			lLeg1.rotation.x = Math.PI;
+			lLeg1.position.y = chest.position.y-4;
+			lLeg1.position.x = chest.position.x-1.5;
+			rLeg1 = lLeg1.clone();
+			rLeg1.position.x = chest.position.x+1.5;
+
+			
+
+			legBox = new THREE.Mesh(new THREE.BoxGeometry(1,5,1),material);
+			legBox.position.y = spherePrimitive.position.y+2.5;
+
+			footBall=spherePrimitive.clone();
+			footBall.position.x = 5;
+
+			footBox = new THREE.Mesh(new THREE.BoxGeometry(1.5,3,0.5),material);
+			footBox.position.y = footBall.position.y+1.5;
+			footBox.position.x = footBall.position.x;
+			
+			lFoot = new THREE.Mesh();
+			lFoot.add(footBox,footBall);
+			lFoot.rotation.x = Math.PI*1.5;
+			lFoot.position.x = lLeg1.position.x-3.5;
+			lFoot.position.y +=5;
+
+			lLeg2 = new THREE.Mesh();
+			lLeg2.position.y = lLeg1.position.y+8;
+			lLeg2.add(legBox, spherePrimitive, lFoot);
+			rLeg2 = lLeg2.clone();
+
+
+			handBox = new THREE.Mesh(new THREE.BoxGeometry(1,6,1),material);
+			handBall = new THREE.Mesh(new THREE.SphereBufferGeometry(1,32,32), material);
+			handBox.position.y = handBall.position.y+3;
+
+			lHand = new THREE.Mesh();
+			lHand.add(handBall,handBox);
+			lHand.rotation.z =0.43;
+			lHand.rotation.y =1.5;
+			lHand.position.x +2;
+			lHand.position.y +=4;
+			rHand=lHand.clone();
+			rHand.rotation.y = rHand.rotation.y*-1; 
+
+			lShld.add(lHand);
+			rShld.add(rHand)
+
+
+			lLeg1.add(lLeg2);
+			rLeg1.add(rLeg2);
+
+
+			chest.add(topp);
+
+
+			robot = new THREE.Mesh();
+			robot.add(chest, lShld, rShld, lLeg1, rLeg1);
+
+			scene.add(robot);
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+		}
+		function animate() {
+			var speed = Date.now()*0.001;
+
+			chest.rotation.y = Math.sin(speed*2)/6;
+			lShld.rotation.x = Math.sin(speed*4);
+			lShld.rotation.z = (Math.sin(speed)/4)+15.5;
+			rShld.rotation.x = -Math.sin(speed*4);
+			rShld.rotation.z = -(Math.sin(speed)/4)+15.5;
+
+			lLeg1.rotation.x = (Math.sin(speed*4)*1.2)+160;
+			rLeg1.rotation.x = -(Math.sin(speed*4)*1.2)+160;
+
+			lLeg2.rotation.x = (Math.sin(speed)/1.2) - 11.5;
+			rLeg2.rotation.x = -(Math.sin(speed)/1.2) - 11.5;
+
+			requestAnimationFrame( animate );
+			controls.update();
+			renderer.render( scene, camera );
+
+
+		}
+	</script>
+</body>
+</html>

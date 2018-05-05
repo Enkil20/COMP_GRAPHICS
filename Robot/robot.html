@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Robot Activity</title>
+	<meta charset="utf-8">
+	<script src="src/three.js"></script>
+	<script src="src/stats.min.js"></script>
+	<script src="src/MeshBasicMaterial.js"></script>
+	<script src="src/OrbitControls.js"></script>
+</head>
+<body>
+	<script>
+		var camera, material, scene, renderer, controls;
+		var primitive, head, chest, neck, lArm, rArm, lLeg, rLeg, head,headSphere, hand1, hand2, lHair,rHair, hair1, hair2, hair3, hair4;
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+			controls = new THREE.OrbitControls( camera );
+			camera.position.set( 0, 0, 30 );
+			camera.lookAt(0,0,0);
+			controls.update();
+
+			scene = new THREE.Scene();
+			material = new THREE.MeshNormalMaterial();
+
+			chest = new THREE.Mesh( new THREE.TetrahedronBufferGeometry( 5, 0 ), material );
+			chest.rotation.x = Math.PI/1.25;
+			chest.rotation.z = Math.PI/1.33;
+			sphere = new THREE.Mesh( new THREE.SphereBufferGeometry(1,32,32), material);
+			box = new THREE.Mesh( new THREE.BoxGeometry(1,1,1), material );
+			box.scale.y +=4;
+			box.position.y +=2;
+
+			
+
+
+			primitive = new THREE.Mesh();
+			primitive.add(sphere,box);
+			neck = box.clone();
+			neck.scale.y -=4;
+			neck.position.y +=2.3;
+			head = neck.clone();
+			head.scale.set(4,4,4);
+			head.position.y +=2.5;
+			headSphere = new THREE.Mesh( new THREE.SphereBufferGeometry(0.6,32,32), material);
+			headSphere.position = head.position;
+
+			hair1 = neck.clone();
+			hair1.scale.set(0.2,0.2,0.2);
+			hair1.position.y -=3.7;
+			hair1.position.x -=0.6;
+			hair2 = hair1.clone();
+			hair2.position.y +=0.2;
+			hair2.position.x -=0.2;
+			hair3 = hair2.clone();
+			hair3.position.y +=0.2;
+			hair3.position.x -=0.2;
+			hair4 = hair2.clone();
+			hair4.position.x -=0.4;
+			lHair = new THREE.Mesh();
+			lHair.add(hair1,hair2,hair3,hair4);
+			rHair = lHair.clone();
+			rHair.rotation.y = Math.PI;
+
+			head.add(neck, headSphere, lHair, rHair);
+
+			lLeg = primitive.clone();
+			lLeg.scale.x -=0.15;
+			lLeg.position.y -=2;
+			lLeg.position.x -=1.5;
+			rLeg = primitive.clone();
+			rLeg.position.x = lLeg.position.x + 3;
+			rLeg.position.y -=2;
+			
+
+			lLeg.rotation.x = Math.PI;
+			rLeg.rotation.x = Math.PI;
+
+			hand1 = new THREE.Mesh(new THREE.SphereBufferGeometry(0.5,32,32),material);
+			hand1.position.y+=5;
+			hand2 = new THREE.Mesh(new THREE.SphereBufferGeometry(0.5,32,32),material);
+			hand2.position.y+=5;
+			lFoot = hand1.clone();
+			rFoot = hand2.clone();
+			lArm = primitive.clone();
+			lArm.add(hand1);
+			rArm = primitive.clone();
+			rArm.add(hand2);
+			lArm.rotation.z +=45;
+			rArm.rotation.z -=45;
+			lArm.position.x -=2;
+			lArm.position.y +=1;
+			lArm.scale.x -=0.15;
+			rArm.position.x+=2;
+			rArm.position.y ++;
+			rArm.scale.x -=0.15;
+
+			lLeg.add(lFoot);
+			rLeg.add(rFoot);
+
+			robot = new THREE.Mesh();
+			robot.add(head, chest, neck, lArm, rArm, lLeg, rLeg);
+			scene.add(robot);
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+		}
+		function animate() {
+			var timer = Date.now()*0.001;
+			rArm.rotation.z = Math.sin(timer/2)-45;
+			lArm.rotation.z = -Math.sin(timer/2)+45;
+			head.rotation.y = Math.sin(timer)/4;
+			lLeg.rotation.x -= Math.sin(timer*2.65)/30;
+			rLeg.rotation.x += Math.sin(timer*2.65)/30;
+
+
+			requestAnimationFrame( animate );
+			controls.update();
+			renderer.render( scene, camera );
+
+
+		}
+	</script>
+</body>
+</html>
