@@ -300,54 +300,6 @@
 				window.location.hash = link;
 
 			}
-
-			function onDocumentKeyDown( event ) {
-
-				if ( firstLetter ) {
-
-					firstLetter = false;
-					text = "";
-
-				}
-
-				var keyCode = event.keyCode;
-
-				// backspace
-
-				if ( keyCode == 8 ) {
-
-					event.preventDefault();
-
-					text = text.substring( 0, text.length - 1 );
-					refreshText();
-
-					return false;
-
-				}
-
-			}
-
-			function onDocumentKeyPress( event ) {
-
-				var keyCode = event.which;
-
-				// backspace
-
-				if ( keyCode == 8 ) {
-
-					event.preventDefault();
-
-				} else {
-
-					var ch = String.fromCharCode( keyCode );
-					text += ch;
-
-					refreshText();
-
-				}
-
-			}
-
 			function loadFont() {
 
 				var loader = new THREE.FontLoader();

@@ -69,17 +69,17 @@
 		//Text
 		var text1;
 		var options = {
-		  size: 90,
-		  height: 90,
-		  weight: 'normal',
-		  font: 'helvetiker',
-		  style: 'normal',
-		  bevelThickness: 2,
-		  bevelSize: 4,
-		  bevelSegments: 3,
-		  bevelEnabled: true,
-		  curveSegments: 12,
-		  steps: 1
+			font: 'helvetiker',
+			size: 90,
+			height: 90,
+			curveSegments: 12,
+			
+			bevelThickness: 2,
+			bevelSize: 4,
+			bevelEnabled: true,
+			
+			material: 0,
+			extrudeMaterial:1
 		};
 
 		init();
@@ -172,7 +172,7 @@
 			//meshFloor.rotation.x -= Math.PI / 2;
 			//scene.add(meshFloor);
 			// add 3D text default
-			var text1;
+			var text1 = "America";
 			var usedIndex;
 			/*index used
 				0 = America
@@ -207,10 +207,9 @@
 		    }
 		    */
 		    //////Change the font to what Gil had.
-		    var textGeom = new THREE.TextGeometry( text1, {
-		        font: 'helvetiker',
-		        size: 60
-		    });
+		    textGeo = new THREE.TextGeometry(text1, options);
+			textGeo.computeBoundingBox();
+			textGeo.computeVertexNormals();
 			//Change the three.js to make it work
 		    var textMesh = new THREE.Mesh( textGeom, material );
 		
