@@ -65,6 +65,22 @@
 
 		//var meshFloor;
 		var meshFloors = [];
+		
+		//Text
+		var text1;
+		var options = {
+		  size: 90,
+		  height: 90,
+		  weight: 'normal',
+		  font: 'helvetiker',
+		  style: 'normal',
+		  bevelThickness: 2,
+		  bevelSize: 4,
+		  bevelSegments: 3,
+		  bevelEnabled: true,
+		  curveSegments: 12,
+		  steps: 1
+		};
 
 		init();
 		animate();
@@ -103,6 +119,11 @@
 			geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 			geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ).setDynamic( true ) );
 			particleSystem = new THREE.Points( geometry, shaderMaterial );
+
+			//Load Text
+			
+			
+
 
 			//FLOORS
 			//GREEN
@@ -150,12 +171,64 @@
 			
 			//meshFloor.rotation.x -= Math.PI / 2;
 			//scene.add(meshFloor);
+			// add 3D text default
+			var text1;
+			var usedIndex;
+			/*index used
+				0 = America
+				1 = Africa
+				2 = Asia
+				3 = Europa
+				4 = Oceania
+			*/
+			
+		    var material = new THREE.MeshPhongMaterial({
+		        color: 0xdddddd
+		    });
+		    /*
+		    switch(indexUsed){
+		    	case 0:
+		    		text1 = "America"
+		    		break;
+		    	case 1:
+		    		text1 = "Africa"
+		    		break;
+		    	case 2:
+		    		text1 = "Asia"
+		    		break;
+		    	case 3:
+		    		text1 = "Europa"
+		    		break;
+		    	case 4:
+		    		text1 = "Oceania"
+		    		break;
+		    	default:
+		    		break;
+		    }
+		    */
+		    //////Change the font to what Gil had.
+		    var textGeom = new THREE.TextGeometry( text1, {
+		        font: 'helvetiker',
+		        size: 60
+		    });
+			//Change the three.js to make it work
+		    var textMesh = new THREE.Mesh( textGeom, material );
+		
+		    textGeom.computeBoundingBox();
+		    var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+		    
+		    //Center the text
+		    textMesh.position.set( -0.5 * textWidth, 100, 0 );
+		    scene.add( textMesh );
+			
+			
 			scene.add(meshFloors[0]);
 			scene.add(meshFloors[1]);
 			scene.add(meshFloors[2]);
 			scene.add(meshFloors[3]);
 			scene.add(meshFloors[4]);
 			scene.add( particleSystem );
+			scene.add(text1);
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
